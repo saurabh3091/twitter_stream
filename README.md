@@ -1,7 +1,7 @@
 # Twitter Streaming Analysis
 
 ### Problem Statement
-Stream tweets from Twitter API for 72 hours and store as JSON.
+Stream tweets from Twitter API for N hours and store as JSON.
 
 Find top 10 trending words and hashtags.
 ### Prerequisites

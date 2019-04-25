@@ -3,10 +3,10 @@ import json
 import logging
 import os
 
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import lower, explode, split, col
 
 from resources.tweet_schema import tweet_schema
+from spark.spark_utils import get_spark_session
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -28,11 +28,7 @@ def main():
     args = parse_cmd_line_args()
 
     # create spark session with local master
-    spark = SparkSession \
-        .builder \
-        .appName("twitter_analysis") \
-        .config("spark.master", "local[*]") \
-        .getOrCreate()
+    spark = get_spark_session("twitter_analysis")
 
     # read raw tweets json
     df = spark.read.json(args.json, schema=tweet_schema) \
@@ -40,7 +36,7 @@ def main():
                     "user.location as user_location", "entities.hashtags as hashtags")
     logging.info(f" Dataframe has a total of {df.count()} tweets")
 
-    # filter tweets for Amsterdam, NL
+    # filter tweets for Amsterdam or NL
     place_filtered_df = df.filter((lower(df.city) == "amsterdam") | (lower(df.country)=="nl"))
 
     logging.info(f"Filtered dataframe has {place_filtered_df.count()} tweets")
@@ -66,9 +62,11 @@ def main():
     trending_hashtags = [row.hashtag for row in trending_hashtags_df.take(10)]
 
     logging.info(f"Saving trend analysis to {os.path.dirname(os.path.realpath(__file__))}/../output.json")
+
     with open("../output.json", "w") as f:
         json.dump({"trending_words" : top_words, "trending_hashtags": trending_hashtags}, f)
     f.close()
+
     logging.info("Job completed successfully")
 
 
