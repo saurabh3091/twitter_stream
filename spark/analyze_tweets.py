@@ -8,9 +8,6 @@ from pyspark.sql.functions import lower, explode, split, col
 from resources.tweet_schema import tweet_schema
 from spark.spark_utils import get_spark_session
 
-log = logging.getLogger()
-log.setLevel(logging.INFO)
-
 
 def parse_cmd_line_args():
     """
@@ -24,6 +21,9 @@ def parse_cmd_line_args():
 
 
 def main():
+    # set logger
+    logging.basicConfig(level=logging.INFO)
+
     # parse input params to spark job
     args = parse_cmd_line_args()
 

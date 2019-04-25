@@ -16,7 +16,9 @@ class TwitterListener(StreamListener):
         self.end_time = datetime.now() + timedelta(hours=config.getint('DEFAULT','duration'))
         self.f=open("resources/tweets.json", "w")
 
-        logging.info(f"Starting sampling twitter... \nStreaming will end at {self.end_time}")
+        logging.basicConfig(level=logging.INFO)
+
+        logging.info(f"Streaming will run till... {self.end_time}")
 
     def on_data(self, data):
         """
@@ -29,7 +31,6 @@ class TwitterListener(StreamListener):
         if datetime.now() < self.end_time:
             # since we are interested in tweets of a particular location
             if json.loads(data).get("place") is not None:
-                print(data)
                 self.f.write(data)
             return True
         else:
@@ -69,5 +70,7 @@ if __name__ == '__main__':
 
     stream = Stream(auth, listener, **options)
 
+    logging.info("Starting sampling tweets...")
+    logging.info("Output will be written to resources/tweets.json")
     # start streaming random tweets
     stream.sample()
